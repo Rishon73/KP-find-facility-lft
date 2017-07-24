@@ -45,24 +45,29 @@ public class LeanFtTest extends UnitTestClassBase {
     public void test() throws GeneralLeanFtException {
         Boolean INSTALL_APP = false;
         Device device= initDevice();
+        if (device != null) {
+            ApplicationDescription appDescription = new ApplicationDescription.Builder()
+                    .identifier(appIdentifier).packaged(false).build();
+            Application app = device.describe(Application.class, appDescription);
 
-        ApplicationDescription appDescription = new ApplicationDescription.Builder()
-                .identifier(appIdentifier).packaged(false).build();
-        Application app = device.describe(Application.class, appDescription);
+            currentDevice = "\"" + device.getName() + "\", Model:" + device.getModel() + ", OS=" + device.getOSType() + ", Version=" + device.getOSVersion();
 
-        currentDevice = "\"" + device.getName() + "\", Model:" + device.getModel() + ", OS=" + device.getOSType() + ", Version=" + device.getOSVersion();
+            System.out.println("Device in use is " + currentDevice
+                    + "\nApp in use: \"" + app.getName() + "\", v" + app.getVersion() + "\n***************************\n"
+            );
 
-        System.out.println("Device in use is " + currentDevice
-                + "\nApp in use: \"" + app.getName() + "\", v" + app.getVersion() + "\n***************************\n"
-        );
+            if (INSTALL_APP) {
+                app.install();
+            } else
+                app.restart();
 
-        if (INSTALL_APP) {
-            app.install();
-        } else
-            app.restart();
-
-        //windowSync(1000);
-        initApp(device);
+            //windowSync(1000);
+            initApp(device);
+        }
+        else {
+            System.out.println("Device couldn't be allocated, exiting script");
+            return;
+        }
 
         // Tap "Find a Facility" button
         System.out.println("Tap \"Find a Facility\" button");
